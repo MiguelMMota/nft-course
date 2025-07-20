@@ -1,3 +1,5 @@
+*Copied from Cyfrin's [NFT](https://github.com/Cyfrin/foundry-nft-cu) course*
+
 # Foundry NFT
 
 This is a section of the Cyfrin Foundry Solidity Course.
