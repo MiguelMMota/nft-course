@@ -14,5 +14,6 @@ lib/
 # Docs
 docs/
 
-# Dotenv file
+# Dotenv/VsCode files
 .DS_Store
+.vscode/
