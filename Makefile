@@ -32,12 +32,8 @@ anvil :; anvil -m 'test test test test test test test test test test test junk' 
 
 NETWORK_ARGS := --password-file .password --broadcast
 LOCAL_ARGS := --rpc-url http://localhost:8545 --account defaultKey
-SEPOLIA_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --account sepoliaKey
+SEPOLIA_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --account sepoliaKey --verify $(ETHERSCAN_API_KEY) -vvvv
 ZKSYNC_ARGS := --rpc-url $(ZKSYNC_RPC_URL) --account zkSyncSepoliaKey
-
-ifeq ($(findstring --network sepolia,$(ARGS)),--network sepolia)
-	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
-endif
 
 deploy:; forge script script/DeployBasicNft.s.sol:DeployBasicNft $(NETWORK_ARGS) $(LOCAL_ARGS)
 deploy-sepolia:; forge script script/DeployBasicNft.s.sol:DeployBasicNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
