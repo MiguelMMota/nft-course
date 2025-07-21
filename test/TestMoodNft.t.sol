@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import {Test, console2} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
 import {DeployMoodNft} from "../script/DeployMoodNft.s.sol";
 import {ServerConstants} from "../script/ServerConstants.s.sol";
@@ -12,8 +12,11 @@ contract TestMoodNft is ServerConstants, Test {
     DeployMoodNft deployer;
     MoodNft public moodNft;
 
-    string constant NFT_NAME = "Mood NFT";
-    string constant NFT_SYMBOL = "MN";
+    string private constant NFT_NAME = "Mood NFT";
+    string private constant NFT_SYMBOL = "MN";
+
+    string private constant HAPPY_TOKEN_URI = 
+        "data:application/json;base64,eyJuYW1lIjogIk1vb2QgTkZUIiwgImRlc2NyaXB0aW9uIjogIkFuIE5GVCB0aGF0IHJlZmxlY3RzIHRoZSBvd25lcidzIG1vb2QiLCJpbWFnZSI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjJhV1YzUW05NFBTSXdJREFnTWpBd0lESXdNQ0lnZDJsa2RHZzlJalF3TUNJZ0lHaGxhV2RvZEQwaU5EQXdJaUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lQZ29nSUR4amFYSmpiR1VnWTNnOUlqRXdNQ0lnWTNrOUlqRXdNQ0lnWm1sc2JEMGllV1ZzYkc5M0lpQnlQU0kzT0NJZ2MzUnliMnRsUFNKaWJHRmpheUlnYzNSeWIydGxMWGRwWkhSb1BTSXpJaTgrQ2lBZ1BHY2dZMnhoYzNNOUltVjVaWE1pUGdvZ0lDQWdQR05wY21Oc1pTQmplRDBpTnpBaUlHTjVQU0k0TWlJZ2NqMGlNVElpTHo0S0lDQWdJRHhqYVhKamJHVWdZM2c5SWpFeU55SWdZM2s5SWpneUlpQnlQU0l4TWlJdlBnb2dJRHd2Wno0S0lDQThjR0YwYUNCa1BTSnRNVE0yTGpneElERXhOaTQxTTJNdU5qa2dNall1TVRjdE5qUXVNVEVnTkRJdE9ERXVOVEl0TGpjeklpQnpkSGxzWlQwaVptbHNiRHB1YjI1bE95QnpkSEp2YTJVNklHSnNZV05yT3lCemRISnZhMlV0ZDJsa2RHZzZJRE03SWk4K0Nqd3ZjM1puUGdvPSIsICJhdHRyaWJ1dGVzIjogW3sidHJhaXRfdHlwZSI6ICJtb29kaW5lc3MiLCJ2YWx1ZSI6IDEwMH1dfQ==";
 
     address public constant NFT_COLLECTOR = address(1);
     address public constant NFT_NOOB = address(2);
@@ -21,7 +24,6 @@ contract TestMoodNft is ServerConstants, Test {
     modifier hasMintedNft() {
         vm.prank(NFT_COLLECTOR);
         moodNft.mintNft();
-        console2.log(moodNft.tokenURI(0));
         _;
     }
 
@@ -34,10 +36,7 @@ contract TestMoodNft is ServerConstants, Test {
         assertEq(moodNft.getTokenCounter(), 0);
 
         vm.expectRevert();
-        assertEq(moodNft.tokenURI(0), "");
-
-        console2.log(NFT_NAME, moodNft.name());
-        console2.log(NFT_SYMBOL, moodNft.symbol());
+        moodNft.tokenURI(0);
 
         assertEq(keccak256(abi.encodePacked(moodNft.name())), keccak256(abi.encodePacked((NFT_NAME))));
         assertEq(keccak256(abi.encodePacked(moodNft.symbol())), keccak256(abi.encodePacked((NFT_SYMBOL))));
@@ -50,6 +49,7 @@ contract TestMoodNft is ServerConstants, Test {
     function testTokenImageURIIsCorrect() public hasMintedNft {
         uint256 tokenId = moodNft.getTokenCounter() - 1;
         assertEq(keccak256(abi.encodePacked(moodNft.getImageUri(tokenId))), keccak256(abi.encodePacked(deployer.getImageUri(MoodNft.Mood.HAPPY))));
+        assertEq(keccak256(abi.encodePacked(moodNft.tokenURI(tokenId))), keccak256(abi.encodePacked(HAPPY_TOKEN_URI)));
     }
 
     function testFlipTokenMood() public hasMintedNft {
