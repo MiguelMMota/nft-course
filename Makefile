@@ -35,19 +35,13 @@ LOCAL_ARGS := --rpc-url http://localhost:8545 --account defaultKey
 SEPOLIA_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --account sepoliaKey --verify $(ETHERSCAN_API_KEY) -vvvv
 ZKSYNC_ARGS := --rpc-url $(ZKSYNC_RPC_URL) --account zkSyncSepoliaKey
 
-deploy:; forge script script/DeployBasicNft.s.sol:DeployBasicNft $(NETWORK_ARGS) $(LOCAL_ARGS)
-deploy-sepolia:; forge script script/DeployBasicNft.s.sol:DeployBasicNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
+deploy:
+	forge script script/Deploy$(word 2,$(MAKECMDGOALS))Nft.s.sol:Deploy$(word 2,$(MAKECMDGOALS))Nft $(NETWORK_ARGS) $(LOCAL_ARGS)
+deploy-sepolia:; forge script script/Deploy$(word 2,$(MAKECMDGOALS))Nft.s.sol:Deploy$(word 2,$(MAKECMDGOALS))Nft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
 deploy-zksync:; forge create src/OurToken.sol:OurToken $(ZKSYNC_ARGS) --legacy --zksync
 	
-mint:; forge script script/Interactions.s.sol:MintBasicNft $(NETWORK_ARGS) $(LOCAL_ARGS)
-mint-sepolia:; forge script script/Interactions.s.sol:MintBasicNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
+mint:; forge script script/Interactions.s.sol:Mint$(word 2,$(MAKECMDGOALS))Nft $(NETWORK_ARGS) $(LOCAL_ARGS)
+mint-sepolia:; forge script script/Interactions.s.sol:Mint$(word 2,$(MAKECMDGOALS))Nft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
 
-deployMood:; forge script script/DeployMoodNft.s.sol:DeployMoodNft $(NETWORK_ARGS) $(LOCAL_ARGS)
-deployMood-sepolia:; forge script script/DeployMoodNft.s.sol:DeployMoodNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
-
-mintMoodNft:; forge script script/Interactions.s.sol:MintMoodNft $(NETWORK_ARGS) $(LOCAL_ARGS)
-mintMoodNft-sepolia:; forge script script/Interactions.s.sol:MintMoodNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
-
-flipMoodNft:; forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS) $(LOCAL_ARGS)
-flipMoodNft-sepolia:; forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
-
+flipMoodNft:; TOKEN_ID=$(word 2,$(MAKECMDGOALS)) forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS) $(LOCAL_ARGS)
+flipMoodNft-sepolia:; TOKEN_ID=$(word 2,$(MAKECMDGOALS)) forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
