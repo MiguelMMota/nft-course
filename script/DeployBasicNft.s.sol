@@ -15,7 +15,7 @@ contract DeployBasicNft is Script {
         return basicNft;
     }
 
-    function run() public returns (BasicNft) {
+    function run() external returns (BasicNft) {
         return createBasicNft();
     }
 }
