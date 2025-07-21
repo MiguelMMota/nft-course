@@ -30,26 +30,28 @@ format :; forge fmt
 
 anvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1
 
-NETWORK_ARGS := --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast
+NETWORK_ARGS := --password-file .password --broadcast
+LOCAL_ARGS := --rpc-url http://localhost:8545 --account defaultKey
+SEPOLIA_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --account sepoliaKey
+ZKSYNC_ARGS := --rpc-url $(ZKSYNC_RPC_URL) --account zkSyncSepoliaKey
 
 ifeq ($(findstring --network sepolia,$(ARGS)),--network sepolia)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vvvv
 endif
 
-deploy:
-	@forge script script/DeployBasicNft.s.sol:DeployBasicNft $(NETWORK_ARGS)
+deploy:; forge script script/DeployBasicNft.s.sol:DeployBasicNft $(NETWORK_ARGS) $(LOCAL_ARGS)
+deploy-sepolia:; forge script script/DeployBasicNft.s.sol:DeployBasicNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
+deploy-zksync:; forge create src/OurToken.sol:OurToken $(ZKSYNC_ARGS) --legacy --zksync
+	
+mint:; forge script script/Interactions.s.sol:MintBasicNft $(NETWORK_ARGS) $(LOCAL_ARGS)
+mint-sepolia:; forge script script/Interactions.s.sol:MintBasicNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
 
-mint:
-	@forge script script/Interactions.s.sol:MintBasicNft ${NETWORK_ARGS}
+deployMood:; forge script script/DeployMoodNft.s.sol:DeployMoodNft $(NETWORK_ARGS) $(LOCAL_ARGS)
+deployMood-sepolia:; forge script script/DeployMoodNft.s.sol:DeployMoodNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
 
-deployMood:
-	@forge script script/DeployMoodNft.s.sol:DeployMoodNft $(NETWORK_ARGS)
+mintMoodNft:; forge script script/Interactions.s.sol:MintMoodNft $(NETWORK_ARGS) $(LOCAL_ARGS)
+mintMoodNft-sepolia:; forge script script/Interactions.s.sol:MintMoodNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
 
-mintMoodNft:
-	@forge script script/Interactions.s.sol:MintMoodNft $(NETWORK_ARGS)
+flipMoodNft:; forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS) $(LOCAL_ARGS)
+flipMoodNft-sepolia:; forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
 
-flipMoodNft:
-	@forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS)
-
-zkdeploy: 
-	@forge create src/OurToken.sol:OurToken --rpc-url http://127.0.0.1:8011 --private-key $(DEFAULT_ZKSYNC_LOCAL_KEY) --legacy --zksync

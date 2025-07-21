@@ -14,6 +14,10 @@ lib/
 # Docs
 docs/
 
+# Private settings
+.env
+.password
+
 # Dotenv/VsCode files
 .DS_Store
 .vscode/
