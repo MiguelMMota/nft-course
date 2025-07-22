@@ -35,13 +35,20 @@ LOCAL_ARGS := --rpc-url http://localhost:8545 --account defaultKey
 SEPOLIA_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --account sepoliaKey --verify $(ETHERSCAN_API_KEY) -vvvv
 ZKSYNC_ARGS := --rpc-url $(ZKSYNC_RPC_URL) --account zkSyncSepoliaKey
 
+
+CONTRACT ?= Basic
 deploy:
-	forge script script/Deploy$(word 2,$(MAKECMDGOALS))Nft.s.sol:Deploy$(word 2,$(MAKECMDGOALS))Nft $(NETWORK_ARGS) $(LOCAL_ARGS)
-deploy-sepolia:; forge script script/Deploy$(word 2,$(MAKECMDGOALS))Nft.s.sol:Deploy$(word 2,$(MAKECMDGOALS))Nft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
+	forge script script/Deploy$(CONTRACT).s.sol:Deploy$(CONTRACT) $(NETWORK_ARGS) $(LOCAL_ARGS)
+deploy-sepolia:; forge script script/Deploy$(CONTRACT).s.sol:Deploy$(CONTRACT) $(NETWORK_ARGS) $(SEPOLIA_ARGS)
 deploy-zksync:; forge create src/OurToken.sol:OurToken $(ZKSYNC_ARGS) --legacy --zksync
 	
-mint:; forge script script/Interactions.s.sol:Mint$(word 2,$(MAKECMDGOALS))Nft $(NETWORK_ARGS) $(LOCAL_ARGS)
-mint-sepolia:; forge script script/Interactions.s.sol:Mint$(word 2,$(MAKECMDGOALS))Nft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
+mint:; forge script script/Interactions.s.sol:Mint$(CONTRACT) $(NETWORK_ARGS) $(LOCAL_ARGS)
+mint-sepolia:; forge script script/Interactions.s.sol:Mint$(CONTRACT) $(NETWORK_ARGS) $(SEPOLIA_ARGS)
 
-flipMoodNft:; TOKEN_ID=$(word 2,$(MAKECMDGOALS)) forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS) $(LOCAL_ARGS)
-flipMoodNft-sepolia:; TOKEN_ID=$(word 2,$(MAKECMDGOALS)) forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
+TOKEN_ID ?= 0
+flipMoodNft:; TOKEN_ID=$(TOKEN_ID) forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS) $(LOCAL_ARGS)
+flipMoodNft-sepolia:; TOKEN_ID=$(TOKEN_ID) forge script script/Interactions.s.sol:FlipMoodNft $(NETWORK_ARGS) $(SEPOLIA_ARGS)
+
+AMOUNT ?= '3 ether'
+callTransferFunctionDirectly:; TRANSFER_AMOUNT=$(AMOUNT) forge script script/Interactions.s.sol:CallTransferFunctionWithSelector $(NETWORK_ARGS) $(LOCAL_ARGS)
+callTransferFunctionDirectly-sepolia:; TRANSFER_AMOUNT=$(AMOUNT) forge script script/Interactions.s.sol:CallTransferFunctionWithSelector $(NETWORK_ARGS) $(SEPOLIA_ARGS)
