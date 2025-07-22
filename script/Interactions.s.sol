@@ -8,6 +8,7 @@ import {DevOpsTools} from "foundry-devops/src/DevOpsTools.sol";
 
 import {ServerConstants} from "../script/ServerConstants.s.sol";
 import {BasicNft} from "../src/BasicNft.sol";
+import {CallAnything} from "../src/CallAnything.sol";
 import {MoodNft} from "../src/MoodNft.sol";
 
 contract MintBasicNft is ServerConstants, Script {
@@ -38,9 +39,9 @@ contract MintMoodNft is Script {
     }
 
     function run() external {
-        address mostRecentlyDeployedBasicNft = DevOpsTools
+        address mostRecentlyDeployedMoodNft = DevOpsTools
             .get_most_recent_deployment("MoodNft", block.chainid);
-        mintNftOnContract(mostRecentlyDeployedBasicNft);
+        mintNftOnContract(mostRecentlyDeployedMoodNft);
     }
 }
 
@@ -57,8 +58,30 @@ contract FlipMoodNft is Script {
     }
 
     function run() external {
-        address mostRecentlyDeployedBasicNft = DevOpsTools
+        address mostRecentlyDeployedMoodNft = DevOpsTools
             .get_most_recent_deployment("MoodNft", block.chainid);
-        flipNftOnContract(mostRecentlyDeployedBasicNft);
+        flipNftOnContract(mostRecentlyDeployedMoodNft);
+    }
+}
+
+contract CallTransferFunctionWithSelector is Script {
+
+    uint256 transferAmount = vm.envOr("TRANSFER_AMOUNT", uint256(0));
+
+    function callTransferWithSelector(address callAnythingAddress) public {
+        CallAnything callAnything = CallAnything(callAnythingAddress);
+
+        address someAddress = address(1);
+        uint256 someAmount = 3 ether;        
+
+        vm.startBroadcast();
+        callAnything.callFunctionWithSelector(someAddress, someAmount);
+        vm.stopBroadcast();
+    }
+
+    function run() external {
+        address mostRecentlyDeployedCallAnything = DevOpsTools
+            .get_most_recent_deployment("CallAnything", block.chainid);
+        callTransferWithSelector(mostRecentlyDeployedCallAnything);
     }
 }
